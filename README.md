@@ -2,7 +2,7 @@
 Corso di Grafica in movimento 2025, SUPSI
 
 ## Esercizio 1A
-Acceso-spento 2 frame<br>
+- [Acceso-spento 2 frame](link)<br>
 Acceso-spento 3 frame<br>
 Aperto-chiuso 2 frame<br>
 Aperto-chiuso 3 frame<br>
