@@ -2,10 +2,10 @@
 Corso di Grafica in movimento 2025, SUPSI
 
 ## Esercizio 1A
-- [Acceso-spento 2 frame](https)<br>
-- [Acceso-spento 3 frame](https)<br>
 - [Aperto-chiuso 2 frame](https)<br>
 - [Aperto-chiuso 3 frame](https)<br>
+- [Acceso-spento 2 frame](https)<br>
+- [Acceso-spento 3 frame](https)<br>
 - [Rotazione 360° 2 frame](https)<br>
 - [Rotazione 360° 3 frame](https)<br>
 - [Spostamento 2 frame](https)<br>
