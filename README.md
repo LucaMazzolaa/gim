@@ -20,5 +20,8 @@ Corso di Grafica in movimento 2025, SUPSI
 ## Esercizio 2
 - [Parallasse](https)
 
-## Esercizio 3
+## Esercizio 3A
 - [Collegamento](https)
+
+## Esercizio 3B
+- [Orologio](https)
