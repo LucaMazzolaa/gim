@@ -12,18 +12,19 @@ Corso di Grafica in movimento 2025, SUPSI
 - [Spostamento 3 frame](https://lucamazzolaa.github.io/gim/Esercizio_1A/spostamento_3.html)<br>
 
 ## Esercizio 1B
-- [Logo animato](https)
+- [Logo animato](https://lucamazzolaa.github.io/gim/Esercizio_1B/index.html)
 
 ## Esercizio 1C
-- [Commento testo di Kleist](https)
+- [Commento testo di Kleist](https://lucamazzolaa.github.io/gim/Esercizio_1C/README.md)
 
 ## Esercizio 2
-- [Parallasse](https)
+- [Parallasse interattivo](https://lucamazzolaa.github.io/gim/Esercizio_2/index_interattivo.html)
+- [Parallasse interattivo](https://lucamazzolaa.github.io/gim/Esercizio_2/index_animato.html)
 
 ## Esercizio 3A
-- [Pong](https)
-- [Pioggia](https)
-- [Neve](https)
+- [Pong](https://lucamazzolaa.github.io/gim/Esercizio_3A/pong/index.html)
+- [Pioggia](https://lucamazzolaa.github.io/gim/Esercizio_3A/pioggia/index.html)
+- [Neve](https://lucamazzolaa.github.io/gim/Esercizio_3A/pioggia/neve.html)
 
 ## Esercizio 3B
-- [Orologio](https)
+- [Orologio](https://lucamazzolaa.github.io/gim/Esercizio_3B/index.html)
