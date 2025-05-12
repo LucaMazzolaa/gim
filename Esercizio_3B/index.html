@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Orologio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #000000;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+<canvas id="clockCanvas"></canvas>
+<script>
+  const canvas = document.getElementById("clockCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    const size = Math.min(window.innerWidth, window.innerHeight);
+    canvas.width = size;
+    canvas.height = size;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  function drawRing(angle, radius, thickness, color) {
+    // Cerchio base grigio chiaro
+    ctx.beginPath();
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 0.5;
+    ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Arco colorato dinamico
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+    ctx.arc(canvas.width / 2, canvas.height / 2, radius, -Math.PI / 2, angle - Math.PI / 2);
+    ctx.stroke();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const now = new Date();
+    const sec = now.getSeconds();
+    const min = now.getMinutes();
+    const hr = now.getHours();
+
+    const hourAngle = ((hr % 12 + min / 60) / 12) * 2 * Math.PI;
+    const minuteAngle = (min / 60) * 2 * Math.PI;
+    const secondAngle = (sec / 60) * 2 * Math.PI;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Cerchi ingranditi
+    drawRing(hourAngle, 160, 36, "#ffa500");     // ore
+    drawRing(minuteAngle, 120, 28, "#00bcd4");   // minuti
+    drawRing(secondAngle, 80, 18, "#e91e63");    // secondi
+
+    ctx.font = "bold 30px sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+
+    const hourStr = String(hr).padStart(2, '0');
+    const minStr = String(min).padStart(2, '0');
+    const secStr = String(sec).padStart(2, '0');
+    const parts = [
+      { text: hourStr, color: "#ffa500" },
+      { text: ":", color: "#888" },
+      { text: minStr, color: "#00bcd4" },
+      { text: ":", color: "#888" },
+      { text: secStr, color: "#e91e63" }
+    ];
+
+    let totalWidth = 0;
+    parts.forEach(part => {
+      totalWidth += ctx.measureText(part.text).width;
+    });
+
+    let x = centerX - totalWidth / 2;
+
+    parts.forEach(part => {
+      ctx.fillStyle = part.color;
+      ctx.fillText(part.text, x, centerY);
+      x += ctx.measureText(part.text).width;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>
