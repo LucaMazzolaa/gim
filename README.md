@@ -12,7 +12,7 @@ Corso di Grafica in movimento 2025, SUPSI
 - [Spostamento 3 frame](https://lucamazzolaa.github.io/gim/Esercizio_1A/spostamento_3.html)<br>
 
 ## Esercizio 1B
-- [Logo animato](https://lucamazzolaa.github.io/gim/Esercizio_1B/index.html)
+- [Logo animato (consiglio scaricare per una corretta visualizzazione)](https://lucamazzolaa.github.io/gim/Esercizio_1B/index.html)
 
 ## Esercizio 1C
 - [Commento testo di Kleist](https://lucamazzolaa.github.io/gim/Esercizio_1C/README.md)
