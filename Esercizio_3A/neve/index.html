@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Luca Mazzola" />
+  <title>Neve</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      height: 100%;
+      background: #0000ff;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  class Drop {
+    constructor(x) {
+      this.x = x;
+      this.y = 0;
+      this.speed = Math.random() * 4 + 2;
+      this.radius = Math.random() * 3 + 2;
+    }
+
+    update() {
+      this.y += this.speed;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fill();
+    }
+  }
+
+  function getSkyColor(hour) {
+    return '#0000ff'; // Blu fisso
+  }
+
+  function drawWaves(minute) {
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = 'white';
+
+    for (let i = 0; i < 3; i++) {
+      const height = 20 + i * 15;
+      const offset = minute / 60 * Math.PI * 2;
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x++) {
+        let y = Math.sin(x * 0.01 + offset + i) * height + canvas.height - 80 - i * 20;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Extra ondulazione bianca in basso
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = 'white';
+    const offset = minute / 60 * Math.PI * 2;
+    ctx.beginPath();
+    for (let x = 0; x < canvas.width; x++) {
+      let y = Math.sin(x * 0.008 + offset) * 25 + canvas.height - 20;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function animate() {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const second = now.getSeconds();
+
+    ctx.fillStyle = getSkyColor(hour);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawWaves(minute);
+
+    if (!drops[second]) {
+      drops[second] = [];
+    }
+    drops[second].push(new Drop(Math.random() * canvas.width));
+
+    for (let sec in drops) {
+      drops[sec].forEach((drop, index) => {
+        drop.update();
+        drop.draw();
+        if (drop.y > canvas.height) drops[sec].splice(index, 1);
+      });
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>

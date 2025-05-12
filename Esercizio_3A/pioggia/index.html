@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Luca Mazzola" />
+  <title>Il Tempo in Caduta</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      height: 100%;
+      background: #4b5563;
+      font-family: 'Inter', sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+  <!-- Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  class Drop {
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * -canvas.height;
+      this.speed = Math.random() * 10 + 8; // velocità aumentata
+      this.length = Math.random() * 20 + 10;
+      this.opacity = Math.random() * 0.5 + 0.3;
+    }
+
+    update() {
+      this.y += this.speed;
+      if (this.y > canvas.height) {
+        this.reset();
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x, this.y + this.length);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  for (let i = 0; i < 300; i++) {
+    drops.push(new Drop());
+  }
+
+  function drawWaves(minute) {
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = 'white';
+
+    for (let i = 0; i < 3; i++) {
+      const height = 20 + i * 15;
+      const offset = minute / 60 * Math.PI * 2;
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x++) {
+        let y = Math.sin(x * 0.01 + offset + i) * height + canvas.height - 80 - i * 20;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Prima onda in primo piano
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = 'white';
+    const offset = minute / 60 * Math.PI * 2;
+    ctx.beginPath();
+    for (let x = 0; x < canvas.width; x++) {
+      let y = Math.sin(x * 0.008 + offset) * 25 + canvas.height - 20;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function animate() {
+    const now = new Date();
+    const minute = now.getMinutes();
+
+    ctx.fillStyle = '#4b5563';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawWaves(minute);
+
+    drops.forEach(drop => {
+      drop.update();
+      drop.draw();
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Luca Mazzola" />
+  <title>Esercizio 3A - Pong</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+
+    body, h1, #timer, #playerScore, #aiScore, .score-label, #winnerText {
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    #gameCanvas {
+      display: block;
+      background: black;
+      z-index: 0;
+    }
+
+    #ui {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #ui div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      background: #000000;
+      color: white;
+      border: 1px solid white;
+      padding: 8px 15px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100px;
+    }
+
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #playerScore, #aiScore {
+      font-size: 50px;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 3;
+    }
+
+    #overlay h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .score-label {
+      position: absolute;
+      font-size: 50px;
+      font-weight: bold;
+      top: 20px;
+    }
+
+    #playerLabel {
+      left: 40px;
+    }
+
+    #aiLabel {
+      right: 40px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div id="ui">
+    <div style="display: flex; gap: 20px;">
+      <button id="pauseButton" onclick="togglePause()">Pausa</button>
+      <button onclick="restartGame()">Ricomincia</button>
+    </div>
+    <div style="display: flex; gap: 40px;">
+      <span id="playerScore">0</span>
+      <span id="aiScore">0</span>
+    </div>
+    <div>
+      <span id="timer">Tempo: 180s</span>
+    </div>
+  </div>
+  <div id="overlay">
+    <h1 id="winnerText">Hai vinto!</h1>
+    <button onclick="restartGame()">Ricomincia</button>
+  </div>
+  <div id="playerLabel" class="score-label">TU</div>
+  <div id="aiLabel" class="score-label">AVVERSARIO</div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const paddleWidth = 16;
+    const paddleHeight = 120;
+    const ballRadius = 10;
+    let trail = [];
+
+    let player = { x: 20, y: canvas.height / 2 - paddleHeight / 2 };
+    let ai = { x: canvas.width - 30, y: canvas.height / 2 - paddleHeight / 2 };
+    let ball = { x: canvas.width / 2, y: canvas.height / 2, vx: 5, vy: 4, radius: ballRadius };
+
+    let playerScore = 0;
+    let aiScore = 0;
+    let paused = false;
+    let time = 180;
+    let gameOver = false;
+    let hue = 0;
+    let exchangeCount = 0;
+
+    const overlay = document.getElementById("overlay");
+    const winnerText = document.getElementById("winnerText");
+    const pauseButton = document.getElementById("pauseButton");
+
+    function drawField() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([12, 12]);
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+    }
+
+    function drawPaddles() {
+      ctx.fillStyle = "white";
+      ctx.fillRect(player.x, player.y, paddleWidth, paddleHeight);
+      ctx.fillRect(ai.x, ai.y, paddleWidth, paddleHeight);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+    }
+
+    function drawTrail() {
+      for (let i = 0; i < trail.length; i++) {
+        const t = trail[i];
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${t.hue}, 100%, 50%)`;
+        ctx.fill();
+      }
+    }
+
+    function updateBall() {
+      if (paused || gameOver) return;
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      hue = (hue + 4) % 360;
+      trail.push({ x: ball.x, y: ball.y, hue });
+
+      if (ball.y <= 0 || ball.y >= canvas.height) ball.vy *= -1;
+
+      if (
+        ball.x - ball.radius <= player.x + paddleWidth &&
+        ball.y >= player.y &&
+        ball.y <= player.y + paddleHeight
+      ) {
+        ball.vx *= -1;
+        exchangeCount++;
+        if (exchangeCount % 3 === 0) {
+          ball.vx *= 1.2;
+          ball.vy *= 1.2;
+        }
+      }
+
+      if (
+        ball.x + ball.radius >= ai.x &&
+        ball.y >= ai.y &&
+        ball.y <= ai.y + paddleHeight
+      ) {
+        ball.vx *= -1;
+        exchangeCount++;
+        if (exchangeCount % 3 === 0) {
+          ball.vx *= 1.2;
+          ball.vy *= 1.2;
+        }
+      }
+
+      if (ball.x <= 0) {
+        aiScore++;
+        resetBall();
+      } else if (ball.x >= canvas.width) {
+        playerScore++;
+        resetBall();
+      }
+
+      document.getElementById("playerScore").textContent = playerScore;
+      document.getElementById("aiScore").textContent = aiScore;
+
+      if (playerScore >= 5 || aiScore >= 5 || time <= 0) {
+        gameOver = true;
+        if (playerScore === aiScore) {
+          winnerText.textContent = "Pareggio!";
+        } else if (playerScore > aiScore) {
+          winnerText.textContent = "Hai vinto!";
+        } else {
+          winnerText.textContent = "Hai perso!";
+        }
+        overlay.style.display = "flex";
+      }
+    }
+
+    function resetBall() {
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  ball.vx = (Math.random() > 0.5 ? 5 : -5);  // Velocità orizzontale casuale
+  ball.vy = (Math.random() > 0.5 ? 4 : -4);  // Velocità verticale casuale
+  // Aggiungi una variazione casuale per rendere il movimento della palla più imprevedibile
+  ball.vy += (Math.random() - 0.5) * 3; // Cambia l'angolo di partenza in modo casuale
+  }
+
+    function updateAI() {
+      if (paused || gameOver) return;
+
+      const centerY = ai.y + paddleHeight / 2;
+      // Rende l'AI più forte raddoppiando la velocità di movimento
+      if (ball.y < centerY - 30) ai.y -= 5; // velocità AI aumentata
+      else if (ball.y > centerY + 30) ai.y += 5;
+
+      if (Math.random() < 0.025) ai.y += (Math.random() - 0.5) * 30; // meno errori
+
+      ai.y = Math.max(10, Math.min(canvas.height - paddleHeight - 10, ai.y));
+    }
+
+    function draw() {
+      drawField();
+      drawTrail();
+      drawPaddles();
+      drawBall();
+    }
+
+    function gameLoop() {
+      updateBall();
+      updateAI();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    canvas.addEventListener("mousemove", e => {
+      const rect = canvas.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      player.y = y - paddleHeight / 2;
+      player.y = Math.max(10, Math.min(canvas.height - paddleHeight - 10, player.y));
+    });
+
+    function togglePause() {
+      paused = !paused;
+      pauseButton.textContent = paused ? "Riprendi" : "Pausa";
+    }
+
+    function restartGame() {
+      playerScore = 0;
+      aiScore = 0;
+      gameOver = false;
+      time = 180;
+      document.getElementById("timer").textContent = "Tempo: 180s";
+      overlay.style.display = "none";
+      trail = [];
+      exchangeCount = 0;
+      resetBall();
+    }
+
+    setInterval(() => {
+      if (!paused && !gameOver) {
+        time--;
+        document.getElementById("timer").textContent = "Tempo: " + time + (time > 1 ? "s" : "");
+      }
+    }, 1000);
+
+    gameLoop();
+  </script>
+</body>
+</html>
