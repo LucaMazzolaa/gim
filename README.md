@@ -24,6 +24,7 @@ Corso di Grafica in movimento 2025, SUPSI
 ## Esercizio 3A
 - [Pong](https://lucamazzolaa.github.io/gim/Esercizio_3A/pong/index.html)
 - [Pioggia](https://lucamazzolaa.github.io/gim/Esercizio_3A/pioggia/index.html)
+- [Neve](https://lucamazzolaa.github.io/gim/Esercizio_3A/neve/index.html)
 
 ## Esercizio 3B
 - [Orologio](https://lucamazzolaa.github.io/gim/Esercizio_3B/index.html)
