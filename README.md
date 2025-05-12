@@ -19,7 +19,7 @@ Corso di Grafica in movimento 2025, SUPSI
 
 ## Esercizio 2
 - [Parallasse interattivo](https://lucamazzolaa.github.io/gim/Esercizio_2/index_interattivo.html)
-- [Parallasse interattivo](https://lucamazzolaa.github.io/gim/Esercizio_2/index_animato.html)
+- [Parallasse animato](https://lucamazzolaa.github.io/gim/Esercizio_2/index_animato.html)
 
 ## Esercizio 3A
 - [Pong](https://lucamazzolaa.github.io/gim/Esercizio_3A/pong/index.html)
